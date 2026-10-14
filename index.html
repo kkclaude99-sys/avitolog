@@ -75,7 +75,16 @@
     font-family:var(--mono);font-size:12px;background:var(--accent-soft);color:var(--accent);
     padding:5px 10px;border-radius:20px;font-weight:600;letter-spacing:.02em;
   }
-  .month-switcher{display:flex;gap:4px;background:#f1f2f4;padding:3px;border-radius:20px;border:1px solid var(--border);}
+  .month-switcher{position:relative;display:inline-flex;align-items:center;}
+  .month-switcher::after{content:'';position:absolute;right:14px;top:50%;width:7px;height:7px;margin-top:-5px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(45deg);pointer-events:none;}
+  .month-select{
+    appearance:none;-webkit-appearance:none;-moz-appearance:none;
+    font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.02em;
+    padding:7px 38px 7px 16px;border-radius:18px;cursor:pointer;
+    background:var(--accent);color:#fff;border:1px solid var(--accent);outline:none;
+  }
+  .month-select:focus-visible{box-shadow:0 0 0 3px rgba(0,0,0,.12);}
+  .month-select option{background:#fff;color:#161816;font-weight:500;}
   .month-pill{
     font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.02em;
     padding:5px 12px;border-radius:16px;cursor:pointer;color:var(--muted);
@@ -303,6 +312,39 @@
     .sidebar{padding:10px;gap:2px;}
     .nav-item{padding:8px 10px;font-size:12.5px;}
   }
+  /* ---------- Динамика ---------- */
+  .dyn-take{font-size:13.5px;color:var(--ink);margin:-6px 0 18px 0;line-height:1.5;}
+  .dyn-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+  @media (max-width:1000px){ .dyn-kpis{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:520px){ .dyn-kpis{grid-template-columns:1fr;} }
+  .dyn-kpi{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+  .dyn-kpi .eyebrow{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;}
+  .dyn-kpi .val{font-family:var(--mono);font-size:22px;font-weight:700;margin-top:8px;}
+  .dyn-kpi .delta{font-size:12px;margin-top:6px;font-family:var(--mono);color:var(--muted);}
+  .dyn-kpi .delta .up{color:var(--accent);font-weight:600;} .dyn-kpi .delta .down{color:var(--danger);font-weight:600;}
+  .dyn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px;margin-bottom:18px;}
+  .dyn-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
+  .dyn-card h3{margin:0;font-size:14px;font-weight:700;}
+  .dyn-card .note{margin:3px 0 10px 0;font-size:12px;color:var(--muted);}
+  .dyn-chart{position:relative;min-height:240px;}
+  .dyn-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);margin-top:8px;}
+  .dyn-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;}
+  .dyn-tip{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--border);border-radius:8px;
+    box-shadow:0 8px 24px -8px rgba(0,0,0,.25);padding:7px 10px;font-size:12px;white-space:nowrap;display:none;z-index:5;font-family:var(--mono);}
+  .dyn-tip .h{font-family:var(--sans);color:var(--muted);margin-bottom:3px;font-weight:600;}
+  .dyn-tip i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;}
+  .dyn-chart svg text{font-family:var(--mono);font-size:11px;fill:var(--muted);}
+  table.dyn-table{width:100%;border-collapse:collapse;font-size:12.8px;}
+  table.dyn-table th{position:sticky;top:0;background:#fafbfc;z-index:2;text-align:right;padding:10px 14px;border-bottom:1px solid var(--border);
+    font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;cursor:pointer;white-space:nowrap;user-select:none;}
+  table.dyn-table th.sorted{color:var(--accent);}
+  table.dyn-table th:first-child,table.dyn-table td:first-child{text-align:left;}
+  table.dyn-table td{padding:8px 14px;border-bottom:1px solid #eef0f2;font-family:var(--mono);text-align:right;white-space:nowrap;}
+  table.dyn-table td:first-child{font-family:var(--sans);font-weight:600;}
+  table.dyn-table td.zero{color:#b5bac2;} table.dyn-table td.up{color:var(--accent);} table.dyn-table td.down{color:var(--danger);}
+  table.dyn-table tbody tr:hover{background:#f8fafb;}
+  .dyn-spark{vertical-align:middle;}
+  @media (max-width:900px){ .dyn-grid{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -317,9 +359,10 @@
     <div class="nav-item" data-view="accounts"><span class="dot"></span>Аккаунты по авитологам</div>
     <div class="nav-item" data-view="payout"><span class="dot"></span>Вознаграждение по авитологам</div>
     <div class="nav-item" data-view="detail"><span class="dot"></span>Вознаграждение по аккаунтам</div>
+    <div class="nav-item" data-view="dynamics"><span class="dot"></span>Динамика</div>
     <div class="sidebar-footer">
-      Загрузка новых месяцев через интерфейс и графики динамики — <b>следующим шагом</b>.<br>
-      Сейчас доступны: <b>май — сентябрь 2026</b> — переключайте вверху справа.
+      Динамика по месяцам — на вкладке <b>«Динамика»</b>.<br>
+      Сейчас доступны: <b>май — сентябрь 2026</b> — месяц выбирается в списке вверху справа.
     </div>
   </aside>
 
@@ -514,6 +557,37 @@
         </div>
       </section>
 
+      <!-- ============ DYNAMICS ============ -->
+      <section class="view" id="view-dynamics">
+        <div class="section-head">
+          <div>
+            <h2>Динамика по месяцам</h2>
+            <p>Все месяцы с мая 2026 сразу — переключатель месяца здесь не нужен. Изменения — последний месяц против предыдущего.</p>
+          </div>
+        </div>
+        <p class="dyn-take" id="dynTake"></p>
+        <div class="dyn-kpis" id="dynKpis"></div>
+        <div class="dyn-grid">
+          <div class="dyn-card"><h3>Начисления, без НДС</h3><p class="note">Весь приход по отчёту Авито: авитологи и «Море трафика».</p><div class="dyn-chart" id="dynAccrual"></div><div class="dyn-legend" id="dynAccrualLeg"></div></div>
+          <div class="dyn-card"><h3>К выплате авитологам</h3><p class="note">После статусных коэффициентов.</p><div class="dyn-chart" id="dynPayout"></div></div>
+          <div class="dyn-card"><h3>Статусы авитологов</h3><p class="note">Сколько авитологов с выплатой в каждом статусе (b2bhelp — внутри своего уровня).</p><div class="dyn-chart" id="dynStatus"></div><div class="dyn-legend" id="dynStatusLeg"></div></div>
+          <div class="dyn-card"><h3>Аккаунты с начислением</h3><p class="note">Аккаунтов в отчёте: у авитологов и у «Моря трафика».</p><div class="dyn-chart" id="dynAccounts"></div><div class="dyn-legend" id="dynAccountsLeg"></div></div>
+        </div>
+        <div class="section-head" style="margin-top:6px;">
+          <div>
+            <h2>Выплаты по авитологам и месяцам</h2>
+            <p>К выплате, ₽. Нажмите на заголовок, чтобы отсортировать.</p>
+          </div>
+        </div>
+        <div class="toolbar">
+          <input type="text" class="search-input" id="dynSearch" placeholder="Поиск по нику…">
+          <span class="count-pill" id="dynCount"></span>
+        </div>
+        <div class="table-scroll">
+          <table class="dyn-table" id="dynTable"><thead><tr id="dynHead"></tr></thead><tbody id="dynBody"></tbody></table>
+        </div>
+      </section>
+
     </div>
   </main>
 
@@ -628,7 +702,8 @@
     overview: 'Общие цифры',
     accounts: 'Аккаунты по авитологам',
     payout: 'Вознаграждение по авитологам',
-    detail: 'Вознаграждение по аккаунтам'
+    detail: 'Вознаграждение по аккаунтам',
+    dynamics: 'Динамика'
   };
   navItems.forEach(item => {
     item.addEventListener('click', () => {
@@ -973,14 +1048,23 @@
 
   function renderMonthSwitcher(){
     const el = document.getElementById('monthSwitcher');
-    el.innerHTML = '';
-    MONTHS.forEach(m => {
-      const btn = document.createElement('button');
-      btn.className = 'month-pill' + (m === currentMonth ? ' active' : '');
-      btn.textContent = MONTH_LABELS[m] || m;
-      btn.addEventListener('click', () => switchMonth(m));
-      el.appendChild(btn);
-    });
+    let sel = document.getElementById('monthSelect');
+    if (!sel) {
+      el.innerHTML = '';
+      sel = document.createElement('select');
+      sel.id = 'monthSelect';
+      sel.className = 'month-select';
+      sel.setAttribute('aria-label', 'Месяц');
+      MONTHS.slice().reverse().forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = MONTH_LABELS[m] || m;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', () => switchMonth(sel.value));
+      el.appendChild(sel);
+    }
+    sel.value = currentMonth;
   }
 
   function updateStaticMonthLabels(){
@@ -1109,5 +1193,211 @@
 
 })();
 </script>
+<script>
+(function(){
+  "use strict";
+  const ALL = JSON.parse(document.getElementById('seed-data').textContent);
+  const MONTHS = Object.keys(ALL).sort();
+  const RU = {'01':'январь','02':'февраль','03':'март','04':'апрель','05':'май','06':'июнь','07':'июль','08':'август','09':'сентябрь','10':'октябрь','11':'ноябрь','12':'декабрь'};
+  const RU_DAT = {'январь':'январю','февраль':'февралю','март':'марту','апрель':'апрелю','май':'маю','июнь':'июню','июль':'июлю','август':'августу','сентябрь':'сентябрю','октябрь':'октябрю','ноябрь':'ноябрю','декабрь':'декабрю'};
+  const lbl = m => RU[m.slice(5)] || m;
+  const AG = 'Море трафика';
+  const nf = new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0});
+  const cf = new Intl.NumberFormat('ru-RU',{notation:'compact',maximumFractionDigits:1});
+  const pf = new Intl.NumberFormat('ru-RU',{style:'percent',maximumFractionDigits:1,signDisplay:'exceptZero'});
+  const C = {accent:'#1f8a70', agency:'#e0a35c', silver:'#b8c0cc', gold:'#d9a520', platinum:'#1f8a70', grid:'#eef0f2', axis:'#d5d9df', purple:'#7c5cd6'};
+  const NS = 'http://www.w3.org/2000/svg';
+
+  const rows = MONTHS.map(m => {
+    const d = ALL[m], t = d.totals, fs = d.financialSummary;
+    const av = fs.filter(s => s.avitolog !== AG), ag = fs.find(s => s.avitolog === AG);
+    const st = s => s.status || '';
+    return {
+      month:m, label:lbl(m),
+      sumNoVat:t.sumNoVat, avitologi:t.avitologiNoVat, agency:t.agencyNoVat, payout:t.payoutTotal,
+      avitologsPaid:av.length,
+      accAv:av.reduce((a,s)=>a+s.count,0), accAg:ag?ag.count:0,
+      silver:av.filter(s=>/Silver|^5\+1/.test(st(s))).length,
+      gold:av.filter(s=>/Gold|^7\+1/.test(st(s))).length,
+      platinum:av.filter(s=>/Platinum/.test(st(s))).length
+    };
+  });
+
+  function el(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+  function txt(tag, attrs, text, parent){ const e = el(tag, attrs, parent); e.textContent = text; return e; }
+  function legend(id, items){ const L = document.getElementById(id); L.innerHTML=''; items.forEach(([c,n])=>{ const s=document.createElement('span'); const i=document.createElement('i'); i.style.background=c; s.appendChild(i); s.appendChild(document.createTextNode(n)); L.appendChild(s); }); }
+  function tip(box){ let t = box.querySelector('.dyn-tip'); if(!t){ t=document.createElement('div'); t.className='dyn-tip'; box.appendChild(t);} return t; }
+  function showTip(box, t, x, y, head, lines){
+    t.innerHTML=''; const h=document.createElement('div'); h.className='h'; h.textContent=head; t.appendChild(h);
+    lines.forEach(([c,n,v])=>{ const l=document.createElement('div'); if(c){const i=document.createElement('i'); i.style.background=c; l.appendChild(i);} l.appendChild(document.createTextNode(n+': '+v)); t.appendChild(l); });
+    t.style.display='block'; const bw=box.clientWidth, tw=t.offsetWidth;
+    t.style.left=Math.max(0,Math.min(bw-tw,x-tw/2))+'px'; t.style.top=Math.max(0,y-t.offsetHeight-12)+'px';
+  }
+  function niceMax(v){ const p = Math.pow(10, Math.floor(Math.log10(v))); const n = v/p; return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p; }
+  function measure(svg, strs){ const t = txt('text',{x:0,y:0},'',svg); let w=0; strs.forEach(s=>{ t.textContent=s; w=Math.max(w,t.getComputedTextLength()); }); svg.removeChild(t); return w; }
+
+  // generic chart frame
+  function frame(box, maxV, fmtTick){
+    box.innerHTML=''; const W = box.clientWidth || 500, H = 240, top = 18, bot = 24;
+    const svg = el('svg',{width:'100%',viewBox:`0 0 ${W} ${H}`},box);
+    const vmax = niceMax(maxV*1.1), ticks = [0, vmax/4, vmax/2, vmax*3/4, vmax];
+    const ml = measure(svg, ticks.map(fmtTick)) + 10;
+    const y = v => H - bot - (v / vmax) * (H - bot - top);
+    ticks.forEach(t => { el('line',{x1:ml,x2:W-4,y1:y(t),y2:y(t),stroke:C.grid},svg); txt('text',{x:ml-6,y:y(t)+4,'text-anchor':'end'},fmtTick(t),svg); });
+    const n = rows.length, band = (W - ml - 4) / n;
+    const cx = i => ml + band*i + band/2;
+    rows.forEach((r,i)=> txt('text',{x:cx(i),y:H-6,'text-anchor':'middle'},r.label,svg));
+    return {svg,W,H,y,band,cx,ml,bot};
+  }
+
+  function stacked(id, keys, colors, names, fmt, legId){
+    const box = document.getElementById(id);
+    const totals = rows.map(r => keys.reduce((a,k)=>a+r[k],0));
+    const f = frame(box, Math.max(...totals), v => fmt(v,true));
+    const bw = Math.min(f.band*0.55, 44);
+    rows.forEach((r,i)=>{
+      let acc = 0;
+      keys.forEach((k,j)=>{
+        const y0 = f.y(acc), y1 = f.y(acc + r[k]); acc += r[k];
+        el('rect',{x:f.cx(i)-bw/2,y:y1,width:bw,height:Math.max(0,y0-y1),fill:colors[j],rx:j===keys.length-1?3:0},f.svg);
+      });
+      txt('text',{x:f.cx(i),y:f.y(totals[i])-6,'text-anchor':'middle'},fmt(totals[i],true),f.svg);
+    });
+    const t = tip(box);
+    rows.forEach((r,i)=>{
+      const hit = el('rect',{x:f.cx(i)-f.band/2,y:0,width:f.band,height:f.H-f.bot,fill:'transparent'},f.svg);
+      hit.addEventListener('mousemove', ev => { const b = box.getBoundingClientRect(); showTip(box,t,f.cx(i)*b.width/f.W, ev.clientY-b.top, r.label, keys.map((k,j)=>[colors[j],names[j],fmt(r[k])]).reverse().concat([[null,'Всего',fmt(totals[i])]])); });
+      hit.addEventListener('mouseleave', ()=> t.style.display='none');
+    });
+    legend(legId, keys.map((k,j)=>[colors[j],names[j]]));
+  }
+
+  function line(id, key, color, fmt, name){
+    const box = document.getElementById(id);
+    const f = frame(box, Math.max(...rows.map(r=>r[key])), v=>fmt(v,true));
+    const pts = rows.map((r,i)=>[f.cx(i), f.y(r[key])]);
+    el('path',{d:'M'+pts.map(p=>p.join(',')).join('L')+`L${pts[pts.length-1][0]},${f.y(0)}L${pts[0][0]},${f.y(0)}Z`,fill:color,'fill-opacity':.08},f.svg);
+    el('path',{d:'M'+pts.map(p=>p.join(',')).join('L'),fill:'none',stroke:color,'stroke-width':2.2,'stroke-linecap':'round','stroke-linejoin':'round'},f.svg);
+    rows.forEach((r,i)=>{ el('circle',{cx:pts[i][0],cy:pts[i][1],r:3.5,fill:color},f.svg); txt('text',{x:pts[i][0],y:pts[i][1]-9,'text-anchor':'middle'},fmt(r[key],true),f.svg); });
+    const t = tip(box);
+    rows.forEach((r,i)=>{
+      const hit = el('rect',{x:f.cx(i)-f.band/2,y:0,width:f.band,height:f.H-f.bot,fill:'transparent'},f.svg);
+      hit.addEventListener('mousemove', ()=>{ const b = box.getBoundingClientRect(); const k=b.width/f.W; showTip(box,t,pts[i][0]*k,pts[i][1]*k,r.label,[[null,name,fmt(r[key])]]); });
+      hit.addEventListener('mouseleave', ()=> t.style.display='none');
+    });
+  }
+
+  const money = (v, short) => short ? cf.format(v) : nf.format(v) + ' ₽';
+  const count = v => nf.format(v);
+
+  function kpis(){
+    const last = rows[rows.length-1], prev = rows[rows.length-2], first = rows[0];
+    const items = [
+      ['payout','К выплате авитологам',true,true],
+      ['sumNoVat','Начислено всего, без НДС',true,true],
+      ['avitologi','Авитологам, без НДС',true,true],
+      ['agency','Море трафика, без НДС',true,null],
+      ['avitologsPaid','Авитологов с выплатой',false,true],
+      ['accAv','Аккаунтов у авитологов',false,true]
+    ];
+    const box = document.getElementById('dynKpis'); box.innerHTML='';
+    items.forEach(([k,name,isMoney,upGood])=>{
+      const d = document.createElement('div'); d.className='dyn-kpi';
+      const e = document.createElement('div'); e.className='eyebrow'; e.textContent = name + ', ' + last.label; d.appendChild(e);
+      const v = document.createElement('div'); v.className='val'; v.textContent = isMoney ? money(last[k]) : count(last[k]); d.appendChild(v);
+      const de = document.createElement('div'); de.className='delta';
+      if (prev){
+        const diff = last[k]-prev[k];
+        const s = document.createElement('span');
+        s.className = diff===0||upGood===null ? '' : ((diff>0)===upGood ? 'up':'down');
+        s.textContent = (diff>0?'+':diff<0?'−':'') + (isMoney? nf.format(Math.abs(diff))+' ₽' : nf.format(Math.abs(diff))) + (prev[k] ? ' ('+pf.format(diff/prev[k])+')' : '');
+        de.appendChild(s); de.appendChild(document.createTextNode(' к ' + (RU_DAT[prev.label]||prev.label)));
+      }
+      d.appendChild(de); box.appendChild(d);
+    });
+    document.getElementById('dynTake').textContent =
+      `За ${last.label} к выплате авитологам ${money(last.payout)}` +
+      (prev ? ` — ${pf.format((last.payout-prev.payout)/prev.payout)} к ${RU_DAT[prev.label]||prev.label}` : '') +
+      ` и ${pf.format((last.payout-first.payout)/first.payout)} с ${first.label === 'май' ? 'мая' : first.label} 2026. Авитологов с выплатой: ${first.avitologsPaid} → ${last.avitologsPaid}.`;
+  }
+
+  // ---- pivot table ----
+  const pivot = (() => {
+    const by = new Map();
+    MONTHS.forEach(m => ALL[m].financialSummary.forEach(s => {
+      if (s.avitolog === AG || typeof s.payout !== 'number') return;
+      if (!by.has(s.avitolog)) by.set(s.avitolog, {avitolog:s.avitolog});
+      by.get(s.avitolog)[m] = s.payout;
+      if (m === MONTHS[MONTHS.length-1]) by.get(s.avitolog).status = s.status;
+    }));
+    const last = MONTHS[MONTHS.length-1], prev = MONTHS[MONTHS.length-2];
+    return Array.from(by.values()).map(o => {
+      MONTHS.forEach(m => { if (o[m] === undefined) o[m] = 0; });
+      o.total = Math.round(MONTHS.reduce((a,m)=>a+o[m],0)*100)/100;
+      o.change = Math.round((o[last] - (prev ? o[prev] : 0))*100)/100;
+      o.status = o.status || '—';
+      return o;
+    });
+  })();
+  let sortKey = 'total', sortDir = -1;
+  function sparkline(vals){
+    const w = 70, h = 18, mx = Math.max(...vals, 1);
+    const svg = el('svg',{width:w,height:h,class:'dyn-spark'});
+    const pts = vals.map((v,i)=>[2+i*(w-4)/(vals.length-1||1), h-2-(v/mx)*(h-4)]);
+    el('path',{d:'M'+pts.map(p=>p.join(',')).join('L'),fill:'none',stroke:C.accent,'stroke-width':1.5,'stroke-linejoin':'round','stroke-linecap':'round'},svg);
+    el('circle',{cx:pts[pts.length-1][0],cy:pts[pts.length-1][1],r:2,fill:C.accent},svg);
+    return svg;
+  }
+  function table(){
+    const cols = [['avitolog','Авитолог']].concat(MONTHS.map(m=>[m,lbl(m)])).concat([['trend','Тренд'],['total','Итого'],['change','Изменение'],['status','Статус']]);
+    const head = document.getElementById('dynHead'); head.innerHTML='';
+    cols.forEach(([k,n])=>{
+      const th = document.createElement('th'); th.textContent = n + (k===sortKey ? (sortDir>0?' ↑':' ↓') : '');
+      if (k===sortKey) th.classList.add('sorted');
+      if (k!=='trend') th.addEventListener('click', ()=>{ if(sortKey===k) sortDir=-sortDir; else { sortKey=k; sortDir=(k==='avitolog'||k==='status')?1:-1; } table(); });
+      else th.style.cursor='default';
+      head.appendChild(th);
+    });
+    const q = document.getElementById('dynSearch').value.trim().toLowerCase();
+    const list = pivot.filter(r=>!q || r.avitolog.toLowerCase().includes(q)).sort((a,b)=>{
+      const va=a[sortKey], vb=b[sortKey];
+      return (typeof va==='number' ? va-vb : String(va).localeCompare(String(vb),'ru')) * sortDir;
+    });
+    const body = document.getElementById('dynBody'); body.innerHTML='';
+    list.forEach(r=>{
+      const tr = document.createElement('tr');
+      cols.forEach(([k])=>{
+        const td = document.createElement('td');
+        if (k==='avitolog'||k==='status') td.textContent = r[k];
+        else if (k==='trend') td.appendChild(sparkline(MONTHS.map(m=>r[m])));
+        else if (k==='change'){ const v=r[k]; td.textContent = v===0?'0':(v>0?'+':'−')+nf.format(Math.abs(v)); td.className = v>0?'up':v<0?'down':'zero'; }
+        else { td.textContent = r[k]===0 ? '—' : nf.format(r[k]); if (r[k]===0) td.className='zero'; }
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+    document.getElementById('dynCount').textContent = list.length + ' авитологов';
+  }
+  document.getElementById('dynSearch').addEventListener('input', table);
+
+  function drawAll(){
+    if (!document.getElementById('view-dynamics').classList.contains('active')) return;
+    kpis();
+    stacked('dynAccrual',['avitologi','agency'],[C.accent,C.agency],['Авитологи','Море трафика'],money,'dynAccrualLeg');
+    line('dynPayout','payout',C.purple,money,'К выплате');
+    stacked('dynStatus',['silver','gold','platinum'],[C.silver,C.gold,C.platinum],['Silver','Gold','Platinum'],v=>count(v),'dynStatusLeg');
+    stacked('dynAccounts',['accAv','accAg'],[C.accent,C.agency],['У авитологов','Море трафика'],v=>count(v),'dynAccountsLeg');
+    table();
+  }
+  // show/hide month switcher and redraw when the tab opens
+  document.querySelectorAll('.nav-item').forEach(item => item.addEventListener('click', () => {
+    const isDyn = item.dataset.view === 'dynamics';
+    const sw = document.getElementById('monthSwitcher'); if (sw) sw.style.display = isDyn ? 'none' : '';
+    if (isDyn) { document.getElementById('pageTitle').textContent = 'Динамика'; setTimeout(drawAll, 0); }
+  }));
+  let rt; window.addEventListener('resize', ()=>{ clearTimeout(rt); rt = setTimeout(drawAll, 150); });
+})();
+</script>
+
 </body>
 </html>
